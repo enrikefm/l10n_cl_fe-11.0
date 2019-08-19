@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_dte_caf_apicaf" model="ir.ui.view">
+            <field name="name">dte.caf.apicaf.form</field>
+            <field name="model">dte.caf.apicaf</field>
+            <field name="arch" type="xml">
+                <form >
+                  <form string="DTE CAF API EMISION FOLIOS">
+                    <header>
+                      <field name="etapa" widget="statusbar" />
+                    </header>
+                    <group>
+                      <field name="company_id" />
+                      <field name="firma" attrs="{'invisible': [('company_id', '=', False)]}" domain="[('user_ids', 'child_of', [uid])]"/>
+                      <field name="documentos" attrs="{'invisible': ['|', ('firma', '=', False), ('documentos', '=', [])]}"
+                             readonly="1"
+                             widget="many2many_tags"/>
+                      <field name="id_peticion" invisible="1"/>
+                    </group>
+                    <group attrs="{'invisible': [('id_peticion', '=', 0)]}" string="Recuerde emitir una cantidad que pueda gastar en un plazo máximo de 6 meses, ya que después de ese tiempo los CAF Vencen y deberá anular en la página del SII los Folios Vencidos">
+                       <field name="jdc_id" domain="[('id', 'in', documentos)]"
+                                            attrs="{'invisible': [('documentos', '=', [])]}"
+                                            options="{'no_create': True, 'no_open': True}"/>
+                       <field name="sequence_id" invisible="1"/>
+                       <field name="cod_docto" domain="[('is_dte', '=', True)]"
+                                               attrs="{'invisible': [('sequence_id', '=', False)]}"/>
+                       <field name="folios_disp" attrs="{'invisible': [('cod_docto', '=', False)]}"/>
+                       <field name="max_autor" attrs="{'invisible': ['|', ('cod_docto', '=', False), ('max_autor', '=', -1)]}"/>
+                       <span attrs="{'invisible': ['|', ('cod_docto', '=', False), ('max_autor', '!=', -1)]}">
+                           Cantidad máxima no especificada
+                       </span>
+                       <field name="cant_doctos" attrs="{'invisible': ['|', ('cod_docto', '=', False), ('max_autor', '=', 0)]}"/>
+                    </group>
+                    <footer>
+                        <button string='Obtener CAF' name="obtener_caf" type="object" class="btn-primary" attrs="{'invisible': ['|', ('etapa', '!=', 'confirmar'), ('cant_doctos', '=', 0)]}"/>
+                        <button string="Cancelar" class="btn-default" special="cancel"/>
+                    </footer>
+                  </form>
+               </form>
+            </field>
+        </record>
+
+        <record id="action_apicaf_form" model="ir.actions.act_window">
+            <field name="name">API Emisión de Folios</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">dte.caf.apicaf</field>
+            <field name="view_id" ref="l10n_cl_fe.view_dte_caf_apicaf"/>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+    </data>
+</odoo>
